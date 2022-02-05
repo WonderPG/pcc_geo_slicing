@@ -1,8 +1,8 @@
 # Latent Space Slicing For Enhanced Entropy Modeling in Learning-Based Point Cloud Geometry Compression
 
 - **Authors**: Nicolas Frank, Davi Lazzarotto and Touradj Ebrahimi.
-- **Affiliation**: Multimedia Signal Processing Group (MMSPG), Ecole Polytechnique Fédérale de Lausanne.
-- **Link**: Coming soon
+- **Affiliation**: Multimedia Signal Processing Group (MMSPG), Ecole Polytechnique FÃ©dÃ©rale de Lausanne.
+- **Link**: Coming soon.
 
 ## Requirements
 
@@ -114,7 +114,7 @@ Afterwards, the directory organisation should look like this:
 
 It is recommended to use the CPU to compress/decompress rather than the GPU. Compressing/decompressing a block using a GPU often introduces a floating-point round off error, that propagate and ruin the reconstruction. Compressing and decompressing using the same CPU alleviates this issue. More information can be found here:
 
-J. Ballé, N. Johnston, D. Minnen,
+J. BallÃ©, N. Johnston, D. Minnen,
 ["Integer Networks for data compression with latent-variable models"](https://openreview.net/pdf?id=S1zz2i0cY7)
 
 If you wish to use the GPU anyway, use the keyword `'--gpu'` in the compress/decompress parser. Furthermore, the `'--debug'` argument in the decompress parser will try to get rid of the errors by retrying the decompression until they don't appear. The minimum tolerable error may have to be set manually, depending on the target bpp and the nature of the point cloud.
