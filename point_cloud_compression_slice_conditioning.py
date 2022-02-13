@@ -425,7 +425,7 @@ class CompressionModel(tf.keras.Model):
   def compress(self, x):
     """Compresses a block."""
     
-    # Add batch dimension and cast to float.
+    # Add batch dimension.
     x = tf.expand_dims(x, 0)
 
     y_strings = []
@@ -645,7 +645,7 @@ def compress(args):
 def decompress(args):
     """Decompresses previously compressed blocks."""
     
-    # Load the model and determine the dtypes of tensors required to decompress.
+    # Load the model.
     model = tf.keras.models.load_model(os.path.join(args.model_path, args.experiment))
         
     # Load the .tfci files to decompress.
@@ -654,7 +654,7 @@ def decompress(args):
     
     # Prepare the original files for debugging if requested.
     if args.debug:
-        assert args.ori_input_glob is not None, 'Please specify the path to the uncompressed blocks for debugging'
+        assert args.ori_input_glob is not None, 'Please specify the path to the uncompressed blocks for debugging.'
         original = pc_io.get_files(args.ori_input_glob)[:args.input_length]
         assert len(original) > 0, 'No original files found'
         
@@ -676,20 +676,11 @@ def decompress(args):
         x_hat = model.decompress(*tensors).numpy()
         
         # Transform the decompressed tensor into an occupancy map
-        # according to threshold.
+        # according to the threshold.
         pa = np.argwhere(x_hat[...,0] > threshold).astype('float32')
         
-        # Compressing/decompressing a file using a GPU
-        # often induces errors that propagate and ruin the reconstruction.
-        # It is strongly recommended to run the compression/decompression
-        # on CPU for this reason. The following section might however
-        # help using a GPU by retrying the decompression until the
-        # reconstruction is done correctly. It is not guarenteed that
-        # it will happen.
-        # More information at:
-        # J. Ballé, N. Johnston, D. Minnen,
-        # "Integer Networks for data compression with latent-variable models"
-        # https://openreview.net/pdf?id=S1zz2i0cY7
+        # If debug is True, tries to correct the potential propagation of
+        # decompression error due to GPu's floating-point round off error.
         if args.debug:
             failed = True
             max_retries = 200
@@ -706,7 +697,7 @@ def decompress(args):
                 
                 # Compute the D1 metric to spot decompression issues.
                 mse = po2po(points[i][:,:3], pa)
-                print('Mse for block ' + str(i) + ': ' + str(mse))
+                print(f'Mse for block {i}: {mse}')
                 
                 # Depending on the PC and the target bpp, different
                 # values of mse should be experimented there.
@@ -716,7 +707,7 @@ def decompress(args):
                     failed = False
                 else:
                     retry += 1
-                    print('Decompression of block ' + str(i) + ' failed, retrying. Attempt number ' + str(retry))
+                    print(f'Decompression of block {i} failed, retrying. Attempt number {retry}')
                     x_hat = model.decompress(*tensors).numpy()
                     pa = np.argwhere(x_hat[...,0] > threshold).astype('float32')
                      
